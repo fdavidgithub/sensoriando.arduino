@@ -1,0 +1,24 @@
+{
+  "name": "SensoriandoLibrary",
+  "keywords": "sensoriando, iot, sensores, sensor",
+  "description": "Functions to access webservice Sensoriando",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/fdavidgithub/sensoriando.arduino.git"
+  },
+  "authors": 
+  [
+    {
+      "name": "Francis David",
+      "email": "contato@fdavid.com.br",
+      "url": "http://www.fdavid.com.br",
+      "maintainer": true
+    },
+  ],
+  "version": "0.0.1",
+  "examples": "",
+  "frameworks": "arduino",
+  "platforms": "*"
+}
+
