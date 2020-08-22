@@ -19,7 +19,6 @@ typedef struct _SensorDatum {
     byte stx;
     int id;
     float value;
-    byte crc;
     byte etx;
 } SensoriandoSensorDatum;
 
