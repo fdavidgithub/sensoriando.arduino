@@ -22,16 +22,26 @@
  * GlobalVariables
  */
 typedef struct _SensorDatum {
-    byte stx;
-    int id;
+/*
+ * stx  | id      | value | etx
+ * ----------------------------
+ * STX  | 0~65536 | float | ETX
+ */
     float value;
-    byte etx;
+    uint16_t id;
+    uint8_t stx;
+    uint8_t etx;
 } SensoriandoSensorDatum;
 
 typedef struct _WifiCommand {
-    byte stx;
-    byte cmd;               //Command/Status
-    byte etx;
+/*
+ * stx  | cmd  | etx
+ * -----------------
+ * STX | 0~255 | ETX
+ */
+    uint8_t stx;
+    uint8_t cmd;               //Command/Status
+    uint8_t etx;
 } SensoriandoWifiCommand;
 
 
