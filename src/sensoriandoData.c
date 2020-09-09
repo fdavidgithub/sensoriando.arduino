@@ -3,7 +3,7 @@
 int8_t sensoriandoGenCrc(int8_t *stream)
 {
     uint8_t crc = 0xff;
-    size_t i, j, len;
+    uint8_t i, j, len;
 
     for (len=0; len<sizeof(stream);len++) {
         if (stream[len] == ETX) {
