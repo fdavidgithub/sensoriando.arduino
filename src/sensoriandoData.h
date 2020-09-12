@@ -25,9 +25,9 @@
  */
 typedef struct _SensorDatum {
 /*
- * stx  | id      | value | dt        | etx
- * ----------------------------------------
- * STX  | 0~65536 | float | timestamp | ETX
+ * syn | stx  | id      | value | dt        | etx
+ * ----------------------------------------------
+ * SYN | STX  | 0~65536 | float | timestamp | ETX
  */
     float value;    //32 bits
     time_t dt;      //32 bits
@@ -38,9 +38,9 @@ typedef struct _SensorDatum {
 
 typedef struct _WifiCommandResult {
 /*
- * stx | cmd   | res   | etx
- * -------------------------
- * STX | 0~255 | 0~255 | ETX
+ * syn | stx | cmd   | res   | etx
+ * -------------------------------
+ * SYN | STX | 0~255 | 0~255 | ETX
  */
     uint8_t stx;
     uint8_t cmd;
@@ -50,9 +50,9 @@ typedef struct _WifiCommandResult {
 
 typedef struct _WifiCommandInit {
 /*
- * stx | cmd      | param     | etx
- * --------------------------------
- * STX | CMD_INIT | unixtime  | ETX
+ * syn | stx | cmd      | param     | etx
+ * --------------------------------------
+ * SYN | STX | CMD_INIT | unixtime  | ETX
  */
     time_t param;       //32 bits
     uint8_t stx;
