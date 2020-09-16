@@ -18,6 +18,7 @@
 #define SYN         0x16    //synchronous idle
 
 #define CMD_INIT    0x20    //check module is init
+#define CMD_UPD     0x21    //update param in module
 
 
 /*
