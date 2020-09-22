@@ -38,15 +38,12 @@ Serial.println(topic); Serial.println(msg);
 #endif
 }
 
-void sensoriandoSendStorage(DateTime dt, float value, char* msg, char* topic)
+void sensoriandoSendStorage(DateTime dt, long value, char* msg, char* topic)
 {
-    char svalue[16];
-    dtostrf(value, 8, 2, svalue);
-
-    sprintf(msg, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%s}", \
+    sprintf(msg, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%ld}", \
                   dt.year(), dt.month(), dt.day(), \
                   dt.hour(), dt.minute(), dt.second(), \
-                  svalue);   
+                  value);   
     sprintf(topic, "%s/%d", BROKER_UUID, STORAGE_ID);
 
 #ifdef DEBUG

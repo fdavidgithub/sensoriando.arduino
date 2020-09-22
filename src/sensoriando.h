@@ -29,7 +29,7 @@
  */
 void sensoriandoSendValue(DateTime, float, int, char*, char*);
 void sensoriandoSendDatetime(DateTime, long, char*, char*);
-void sensoriandoSendStorage(DateTime, float, char*, char*);
+void sensoriandoSendStorage(DateTime, long, char*, char*);
 void sensoriandoSendMessage(DateTime, char*, char*, char*); 
 
 #endif
