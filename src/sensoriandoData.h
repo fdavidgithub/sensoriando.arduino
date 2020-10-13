@@ -19,6 +19,7 @@
 
 #define CMD_INIT    0x20    //check module is init
 #define CMD_UPD     0x21    //update param in module
+#define CMD_PAIR    0x22    //start pairing
 
 
 /*
@@ -47,7 +48,7 @@ typedef struct _WifiCommandResult {
     uint8_t cmd;
     uint8_t res;
     uint8_t etx;
-} SensoriandoWifiCommandResult;
+} __attribute__((packed, aligned(1))) SensoriandoWifiCommandResult;
 
 typedef struct _WifiCommandInit {
 /*
@@ -59,8 +60,7 @@ typedef struct _WifiCommandInit {
     uint8_t stx;
     uint8_t cmd;
     uint8_t etx;
-    uint8_t padding;    //ignore, memory layout for 32 bits architecture
-} SensoriandoWifiCommandInit;
+} __attribute__((packed, aligned(1))) SensoriandoWifiCommandInit;
 
 
 /*
