@@ -16,9 +16,9 @@
  */
 //#define DEBUG
 
-#define MESSAGE_ID      2   //id for message on Sensoriando
 #define TIME_ID         1   //id for time rtc on Sensoriando
-#define STORAGE_ID      12  //id for storage on Sensoriando
+#define STORAGE_ID      2   //id for storage on Sensoriando
+#define MESSAGE_ID      3   //id for message on Sensoriando
 
 #define BROKER          "broker.sensoriando.com.br"
 #define BROKER_UUID     "27c36465-7356-4fe7-b726-cf619a9a22f0"
