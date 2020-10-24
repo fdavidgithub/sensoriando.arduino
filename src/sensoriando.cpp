@@ -9,58 +9,92 @@
  *                   dt.hour(), dt.minute(), dt.second(), \
  *                   value);   
  */
-void sensoriandoSendValue(DateTime dt, float value_sensor, int id_sensor, char* msg, char* topic)
+void float2string(float value, char *svalue)
+{
+    dtostrf(value, 8, 2, svalue);
+}
+
+void epoch2time(time_t epoch, struct tm *dt)
+{
+    memcpy(dt, gmtime(&epoch), sizeof(struct tm));
+    dt->tm_year = dt->tm_year+1900;
+}
+
+
+/* 
+ * Public functions
+ */
+void sensoriandoSendValue(SensoriandoParser *sensoring, char *payload, char *topic)
 {
     char svalue[16];
-    dtostrf(value_sensor, 8, 2, svalue);
+    struct tm dt;
 
-    sprintf(msg, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%s}", \
-                    dt.year(), dt.month(), dt.day(), \
-                    dt.hour(), dt.minute(), dt.second(), \
+    float2string(sensoring->value, svalue);
+    epoch2time(sensoring->dt, &dt);
+
+    sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%s}", \
+                    dt.tm_year, dt.tm_mon, dt.tm_mday, \
+                    dt.tm_hour, dt.tm_min, dt.tm_sec, \
                     svalue);   
-    sprintf(topic, "%s/%d", BROKER_UUID, id_sensor);
+    
+    sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
 #ifdef DEBUG
-Serial.println(topic); Serial.println(msg);
+Serial.print("[Sensorindo Arduino] ");Serial.println(topic);Serial.println(payload);
 #endif
 }
 
-void sensoriandoSendDatetime(DateTime dt, long value_dt, char* msg, char* topic)
+void sensoriandoSendDatetime(SensoriandoParser *sensoring, char *payload, char *topic)
 {
-    sprintf(msg, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%ld}", \
-                  dt.year(), dt.month(), dt.day(), \
-                  dt.hour(), dt.minute(), dt.second(), \
-                  value_dt);   
-    sprintf(topic, "%s/%d", BROKER_UUID, TIME_ID);
+    struct tm dt;
+
+    epoch2time(sensoring->dt, &dt);
+
+    sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%ld}", \
+                  dt.tm_year, dt.tm_mon, dt.tm_mday, \
+                  dt.tm_hour, dt.tm_min, dt.tm_sec, \
+                  sensoring->dt);   
+
+    sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
 #ifdef DEBUG
-Serial.println(topic); Serial.println(msg);
+Serial.println(topic); Serial.println(payload);
 #endif
 }
 
-void sensoriandoSendStorage(DateTime dt, long value, char* msg, char* topic)
+void sensoriandoSendStorage(SensoriandoParser *sensoring, char *payload, char *topic)
 {
-    sprintf(msg, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%ld}", \
-                  dt.year(), dt.month(), dt.day(), \
-                  dt.hour(), dt.minute(), dt.second(), \
-                  value);   
-    sprintf(topic, "%s/%d", BROKER_UUID, STORAGE_ID);
+    struct tm dt;
+
+    epoch2time(sensoring->dt, &dt);
+
+    sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%ld}", \
+                  dt.tm_year, dt.tm_mon, dt.tm_mday, \
+                  dt.tm_hour, dt.tm_min, dt.tm_sec, \
+                  sensoring->value);   
+
+    sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
 #ifdef DEBUG
-Serial.println(topic); Serial.println(msg);
+Serial.println(topic); Serial.println(payload);
 #endif
 }
 
-void sensoriandoSendMessage(DateTime dt, char* msg, char* topicmsg, char* topic)
+void sensoriandoSendMessage(SensoriandoParser *sensoring, char *payload, char *topic)
 {
-    sprintf(topicmsg, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":\"%s\"}", \
-                    dt.year(), dt.month(), dt.day(), \
-                    dt.hour(), dt.minute(), dt.second(), \
-                    msg);   
-    sprintf(topic, "%s/%d", BROKER_UUID, MESSAGE_ID);
+    struct tm dt;
+
+    epoch2time(sensoring->dt, &dt);
+
+    sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":\"%s\"}", \
+                    dt.tm_year, dt.tm_mon, dt.tm_mday, \
+                    dt.tm_hour, dt.tm_min, dt.tm_sec, \
+                    sensoring->msg);   
+
+    sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
 #ifdef DEBUG
-Serial.println(topic); Serial.println(topicmsg);
+Serial.println(topic); Serial.println(payload);
 #endif
 }
 

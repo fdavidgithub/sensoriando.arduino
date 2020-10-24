@@ -21,22 +21,33 @@
 #define CMD_UPD     0x21    //update param in module
 #define CMD_PAIR    0x22    //start pairing
 
+#define UUID_LEN    37      //36 byte UUID + 1
+
 
 /*
  * GlobalVariables
  */
+typedef struct _Sensoriando {
+    char msg[256];
+    char uuid[UUID_LEN];
+    time_t dt;
+    float value;
+    int id;
+} SensoriandoParser;
+
 typedef struct _SensorDatum {
 /*
- * syn | stx  | id      | value | dt        | etx
- * ----------------------------------------------
- * SYN | STX  | 0~65536 | float | timestamp | ETX
+ * syn | stx  | uuid | id      | value | dt        | etx
+ * -----------------------------------------------------
+ * SYN | STX  | char | 0~65536 | float | timestamp | ETX
  */
+    char uuid[UUID_LEN];  //36 bits
     float value;    //32 bits
     time_t dt;      //32 bits
     uint16_t id;
     uint8_t stx;
     uint8_t etx;
-} SensoriandoSensorDatum;
+} __attribute__((packed, aligned(1))) SensoriandoSensorDatum;
 
 typedef struct _WifiCommandResult {
 /*
