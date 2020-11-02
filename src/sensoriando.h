@@ -14,7 +14,7 @@
 /*
  * MACROS
  */
-//#define DEBUG
+#define DEBUG
 
 
 #define BROKER          "broker.sensoriando.com.br"

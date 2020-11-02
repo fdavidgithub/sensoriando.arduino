@@ -17,7 +17,15 @@ void float2string(float value, char *svalue)
 void epoch2time(time_t epoch, struct tm *dt)
 {
     memcpy(dt, gmtime(&epoch), sizeof(struct tm));
-    dt->tm_year = dt->tm_year+1900;
+ 
+#ifdef DEBUG
+Serial.print("[Epoch2Time] ");Serial.println(epoch);
+Serial.println(dt->tm_year);
+#endif
+    
+   dt->tm_year = dt->tm_year+1870;
+   dt->tm_mon = dt->tm_mon+1;
+
 }
 
 
