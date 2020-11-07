@@ -32,8 +32,40 @@ Serial.println(dt->tm_year);
 /* 
  * Public functions
  */
-void sensoriandoSendValue(SensoriandoParser *sensoring, char *payload, char *topic)
+byte sensoriandoInit(SensoriandoObj *obj)
 {
+    byte res;
+    
+    obj->setServer(BROKER, BROKER_PORT);  
+    res = obj->connect("Sensoriando", BROKER_USER, BROKER_PASSWD);
+    return res;
+}
+
+byte sensoriandoReconnect(SensoriandoObj *obj) 
+{
+    if ( !obj->connected() ) {
+#ifdef DEBUG_MQTT
+        Serial.print("Attempting MQTT connection...");
+#endif
+        if ( obj->connect("Sensoriando", BROKER_USER, BROKER_PASSWD)) {
+#ifdef DEBUG_MQTT
+            Serial.println("Broker Connected");
+#endif
+
+        } else {
+#ifdef DEBUG_MQTT
+            Serial.print("failed, rc=");
+            Serial.print(obj->state());
+#endif      
+        }
+    }
+
+    return obj->connected();
+}
+
+void sensoriandoSendValue(SensoriandoObj *obj, SensoriandoParser *sensoring)
+{
+    char payload[ARRAY_LEN], topic[ARRAY_LEN];
     char svalue[16];
     struct tm dt;
 
@@ -50,10 +82,13 @@ void sensoriandoSendValue(SensoriandoParser *sensoring, char *payload, char *top
 #ifdef DEBUG
 Serial.print("[Sensorindo Arduino] ");Serial.println(topic);Serial.println(payload);
 #endif
+
+    obj->publish(topic, payload);   
 }
 
-void sensoriandoSendDatetime(SensoriandoParser *sensoring, char *payload, char *topic)
+void sensoriandoSendDatetime(SensoriandoObj *obj, SensoriandoParser *sensoring)
 {
+    char payload[ARRAY_LEN], topic[ARRAY_LEN];
     struct tm dt;
 
     epoch2time(sensoring->dt, &dt);
@@ -68,10 +103,13 @@ void sensoriandoSendDatetime(SensoriandoParser *sensoring, char *payload, char *
 #ifdef DEBUG
 Serial.println(topic); Serial.println(payload);
 #endif
+
+    obj->publish(topic, payload);
 }
 
-void sensoriandoSendStorage(SensoriandoParser *sensoring, char *payload, char *topic)
+void sensoriandoSendStorage(SensoriandoObj *obj, SensoriandoParser *sensoring)
 {
+    char payload[ARRAY_LEN], topic[ARRAY_LEN];
     struct tm dt;
 
     epoch2time(sensoring->dt, &dt);
@@ -86,10 +124,13 @@ void sensoriandoSendStorage(SensoriandoParser *sensoring, char *payload, char *t
 #ifdef DEBUG
 Serial.println(topic); Serial.println(payload);
 #endif
+
+    obj->publish(topic, payload);
 }
 
-void sensoriandoSendMessage(SensoriandoParser *sensoring, char *payload, char *topic)
+void sensoriandoSendMessage(SensoriandoObj *obj, SensoriandoParser *sensoring)
 {
+    char payload[ARRAY_LEN], topic[ARRAY_LEN];
     struct tm dt;
 
     epoch2time(sensoring->dt, &dt);
@@ -104,5 +145,7 @@ void sensoriandoSendMessage(SensoriandoParser *sensoring, char *payload, char *t
 #ifdef DEBUG
 Serial.println(topic); Serial.println(payload);
 #endif
+
+    obj->publish(topic, payload);
 }
 
