@@ -18,7 +18,7 @@ void epoch2time(time_t epoch, struct tm *dt)
 {
     memcpy(dt, gmtime(&epoch), sizeof(struct tm));
  
-#ifdef DEBUG
+#ifdef DEBUG_SENSORIANDO
 Serial.print("[Epoch2Time] ");Serial.println(epoch);
 Serial.println(dt->tm_year);
 #endif
@@ -70,16 +70,22 @@ void sensoriandoSendValue(SensoriandoObj *obj, SensoriandoParser *sensoring)
     struct tm dt;
 
     float2string(sensoring->value, svalue);
-    epoch2time(sensoring->dt, &dt);
 
-    sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%s}", \
-                    dt.tm_year, dt.tm_mon, dt.tm_mday, \
-                    dt.tm_hour, dt.tm_min, dt.tm_sec, \
-                    svalue);   
-    
+    if ( sensoring->dt ) {
+        epoch2time(sensoring->dt, &dt);
+
+        sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%s}", \
+                        dt.tm_year, dt.tm_mon, dt.tm_mday, \
+                     dt.tm_hour, dt.tm_min, dt.tm_sec, \
+                     svalue);   
+    } else {
+         sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%s}", \
+                        0, 0, 0, 0, 0, 0, svalue);      
+    }
+
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
-#ifdef DEBUG
+#ifdef DEBUG_SENSORIANDO
 Serial.print("[Sensorindo Arduino] ");Serial.println(topic);Serial.println(payload);
 #endif
 
@@ -100,7 +106,7 @@ void sensoriandoSendDatetime(SensoriandoObj *obj, SensoriandoParser *sensoring)
 
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
-#ifdef DEBUG
+#ifdef DEBUG_SENSORIANDO
 Serial.println(topic); Serial.println(payload);
 #endif
 
@@ -110,18 +116,21 @@ Serial.println(topic); Serial.println(payload);
 void sensoriandoSendStorage(SensoriandoObj *obj, SensoriandoParser *sensoring)
 {
     char payload[ARRAY_LEN], topic[ARRAY_LEN];
+    char svalue[16];
     struct tm dt;
 
     epoch2time(sensoring->dt, &dt);
+    float2string(sensoring->value, svalue);
 
-    sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%ld}", \
+    sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%s}", \
                   dt.tm_year, dt.tm_mon, dt.tm_mday, \
                   dt.tm_hour, dt.tm_min, dt.tm_sec, \
-                  sensoring->value);   
+                  svalue);   
 
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
-#ifdef DEBUG
+#ifdef DEBUG_SENSORIANDO
+Serial.println(sensoring->value);
 Serial.println(topic); Serial.println(payload);
 #endif
 
