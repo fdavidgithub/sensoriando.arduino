@@ -19,10 +19,15 @@
 
 #define ARRAY_LEN       256
 
-#define BROKER          "broker.sensoriando.com.br"
-#define BROKER_PORT     1883
-#define BROKER_USER     "fdavid"
-#define BROKER_PASSWD   "12345678"
+#define BROKER              "broker.sensoriando.com.br"
+#define BROKER_PORT         1883
+#define BROKER_USER         "fdavid"
+#define BROKER_PASSWD       "12345678"
+#define BROKER_CLIENTNAME   "Sensoriando"
+
+#define SYSTEM_RTC          1
+#define SYSTEM_STORAGE      2
+#define SSYTEM_MESSAGE      3
 
 typedef PubSubClient SensoriandoObj;
 
@@ -30,13 +35,13 @@ typedef PubSubClient SensoriandoObj;
 /*
  * prototypes
  */
-byte sensoriandoInit(SensoriandoObj *);
+byte sensoriandoInit(SensoriandoObj *, uint8_t *);
 byte sensoriandoReconnect(SensoriandoObj *);
  
-void sensoriandoSendValue(SensoriandoObj *, SensoriandoParser *);
-void sensoriandoSendDatetime(SensoriandoObj *, SensoriandoParser *);
-void sensoriandoSendStorage(SensoriandoObj *, SensoriandoParser *);
-void sensoriandoSendMessage(SensoriandoObj *, SensoriandoParser *);
+byte sensoriandoSendValue(SensoriandoObj *, SensoriandoParser *);
+byte sensoriandoSendDatetime(SensoriandoObj *, SensoriandoParser *);
+byte sensoriandoSendStorage(SensoriandoObj *, SensoriandoParser *);
+byte sensoriandoSendMessage(SensoriandoObj *, SensoriandoParser *);
 
 #endif
 

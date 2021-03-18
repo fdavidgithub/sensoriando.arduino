@@ -32,28 +32,39 @@ Serial.println(dt->tm_year);
 /* 
  * Public functions
  */
-byte sensoriandoInit(SensoriandoObj *obj)
+byte sensoriandoInit(SensoriandoObj *obj, uint8_t *mac)
 {
     byte res;
+    char namedevice[30] = BROKER_CLIENTNAME;
+
+    for (int i=0; i<sizeof(mac); i++) {
+        sprintf(namedevice, "%s%02X", namedevice, mac[i]);
+    }
     
+#ifdef DEBUG_SENSORIANDO
+    Serial.print("[DEBUG SENSORIANDO] ");
+    Serial.println(namedevice);
+#endif
+
     obj->setServer(BROKER, BROKER_PORT);  
-    res = obj->connect("Sensoriando", BROKER_USER, BROKER_PASSWD);
+    res = obj->connect(namedevice, BROKER_USER, BROKER_PASSWD);
+
     return res;
 }
 
 byte sensoriandoReconnect(SensoriandoObj *obj) 
 {
     if ( !obj->connected() ) {
-#ifdef DEBUG_MQTT
+#ifdef DEBUG_SENSORIANDO
         Serial.print("Attempting MQTT connection...");
 #endif
         if ( obj->connect("Sensoriando", BROKER_USER, BROKER_PASSWD)) {
-#ifdef DEBUG_MQTT
+#ifdef DEBUG_SENSORIANDO
             Serial.println("Broker Connected");
 #endif
 
         } else {
-#ifdef DEBUG_MQTT
+#ifdef DEBUG_SENSORIANDO
             Serial.print("failed, rc=");
             Serial.print(obj->state());
 #endif      
@@ -63,98 +74,133 @@ byte sensoriandoReconnect(SensoriandoObj *obj)
     return obj->connected();
 }
 
-void sensoriandoSendValue(SensoriandoObj *obj, SensoriandoParser *sensoring)
+byte sensoriandoSendValue(SensoriandoObj *obj, SensoriandoParser *sensoring)
 {
     char payload[ARRAY_LEN], topic[ARRAY_LEN];
     char svalue[16];
     struct tm dt;
+    byte res;
 
     float2string(sensoring->value, svalue);
 
     if ( sensoring->dt ) {
         epoch2time(sensoring->dt, &dt);
-
         sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%s}", \
                         dt.tm_year, dt.tm_mon, dt.tm_mday, \
                      dt.tm_hour, dt.tm_min, dt.tm_sec, \
                      svalue);   
     } else {
-         sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%s}", \
-                        0, 0, 0, 0, 0, 0, svalue);      
+        sprintf(payload, "{\"value\":%s}", svalue);      
     }
 
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
+    res = obj->publish(topic, payload);   
+
 #ifdef DEBUG_SENSORIANDO
-Serial.print("[Sensorindo Arduino] ");Serial.println(topic);Serial.println(payload);
+Serial.print("[DEBUG_SENSORIANDO] ");
+Serial.println(topic);
+Serial.println(payload);
 #endif
 
-    obj->publish(topic, payload);   
+    return res;
 }
 
-void sensoriandoSendDatetime(SensoriandoObj *obj, SensoriandoParser *sensoring)
+
+byte sensoriandoSendDatetime(SensoriandoObj *obj, SensoriandoParser *sensoring)
 {
     char payload[ARRAY_LEN], topic[ARRAY_LEN];
     struct tm dt;
+    byte res;
 
-    epoch2time(sensoring->dt, &dt);
-
-    sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%ld}", \
+    if ( sensoring->dt ) {
+        epoch2time(sensoring->dt, &dt);
+        sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%ld}", \
                   dt.tm_year, dt.tm_mon, dt.tm_mday, \
                   dt.tm_hour, dt.tm_min, dt.tm_sec, \
                   sensoring->dt);   
+    } else {
+        sprintf(payload, "{\"value\":%ld}", sensoring->dt);       
+    }
+
+    if ( ! sensoring->id ) {
+        sensoring-id = SYSTEM_RTC;
+    }
 
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
+
+    res = obj->publish(topic, payload);
 
 #ifdef DEBUG_SENSORIANDO
 Serial.println(topic); Serial.println(payload);
 #endif
 
-    obj->publish(topic, payload);
+    return res;
 }
 
-void sensoriandoSendStorage(SensoriandoObj *obj, SensoriandoParser *sensoring)
+byte sensoriandoSendStorage(SensoriandoObj *obj, SensoriandoParser *sensoring)
 {
     char payload[ARRAY_LEN], topic[ARRAY_LEN];
     char svalue[16];
     struct tm dt;
+    byte res;
 
-    epoch2time(sensoring->dt, &dt);
     float2string(sensoring->value, svalue);
 
-    sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%s}", \
+    if ( sensoring->dt ) {
+        epoch2time(sensoring->dt, &dt);
+        sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":%s}", \
                   dt.tm_year, dt.tm_mon, dt.tm_mday, \
                   dt.tm_hour, dt.tm_min, dt.tm_sec, \
                   svalue);   
+    } else {
+        sprintf(payload, "{\"value\":%s}", svalue);        
+    }
+
+    if ( ! sensoring->id ) {
+        sensoring-id = SYSTEM_STORAGE;
+    }
 
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
+
+    res = obj->publish(topic, payload);
 
 #ifdef DEBUG_SENSORIANDO
 Serial.println(sensoring->value);
 Serial.println(topic); Serial.println(payload);
 #endif
 
-    obj->publish(topic, payload);
+    return res;
 }
 
-void sensoriandoSendMessage(SensoriandoObj *obj, SensoriandoParser *sensoring)
+byte sensoriandoSendMessage(SensoriandoObj *obj, SensoriandoParser *sensoring)
 {
     char payload[ARRAY_LEN], topic[ARRAY_LEN];
     struct tm dt;
+    byte res;
 
-    epoch2time(sensoring->dt, &dt);
-
-    sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":\"%s\"}", \
+    if ( sensoring->dt ) {
+        epoch2time(sensoring->dt, &dt);
+        sprintf(payload, "{\"dt\":\"%04d%02d%02d%02d%02d%02d\", \"value\":\"%s\"}", \
                     dt.tm_year, dt.tm_mon, dt.tm_mday, \
                     dt.tm_hour, dt.tm_min, dt.tm_sec, \
                     sensoring->msg);   
+    } else {
+        sprintf(payload, "{\"value\":\"%s\"}", sensoring->msg);         
+    }
+
+    if ( ! sensoring->id ) {
+        sensoring-id = SYSTEM_MESSAGE;
+    }
 
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
+
+    res =  obj->publish(topic, payload);
 
 #ifdef DEBUG
 Serial.println(topic); Serial.println(payload);
 #endif
 
-    obj->publish(topic, payload);
+    return res;
 }
 
