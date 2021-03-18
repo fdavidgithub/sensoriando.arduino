@@ -28,10 +28,10 @@
  * GlobalVariables
  */
 typedef struct _Sensoriando {
-    char msg[256];
     char uuid[UUID_LEN];
     time_t dt;
     float value;
+    char msg[256];
     int id;
 } SensoriandoParser;
 
