@@ -28,6 +28,18 @@ Serial.println(dt->tm_year);
 
 }
 
+void genname(char *namedevice, uint8_t *mac)
+{
+    for (int i=0; i<sizeof(mac); i++) {
+        sprintf(namedevice, "%s%02X", namedevice, mac[i]);
+    }
+    
+#ifdef DEBUG_SENSORIANDO
+    Serial.print("[DEBUG SENSORIANDO] ");
+    Serial.println(namedevice);
+#endif
+}
+
 
 /* 
  * Public functions
@@ -37,14 +49,7 @@ byte sensoriandoInit(SensoriandoObj *obj, uint8_t *mac)
     byte res;
     char namedevice[30] = BROKER_CLIENTNAME;
 
-    for (int i=0; i<sizeof(mac); i++) {
-        sprintf(namedevice, "%s%02X", namedevice, mac[i]);
-    }
-    
-#ifdef DEBUG_SENSORIANDO
-    Serial.print("[DEBUG SENSORIANDO] ");
-    Serial.println(namedevice);
-#endif
+    genname(namedevice, mac);
 
     obj->setServer(BROKER, BROKER_PORT);  
     res = obj->connect(namedevice, BROKER_USER, BROKER_PASSWD);
@@ -52,17 +57,20 @@ byte sensoriandoInit(SensoriandoObj *obj, uint8_t *mac)
     return res;
 }
 
-byte sensoriandoReconnect(SensoriandoObj *obj) 
+byte sensoriandoReconnect(SensoriandoObj *obj, uint8_t *mac) 
 {
+    char namedevice[30] = BROKER_CLIENTNAME;
+
     if ( !obj->connected() ) {
+        genname(namedevice, mac);
+
 #ifdef DEBUG_SENSORIANDO
         Serial.print("Attempting MQTT connection...");
 #endif
-        if ( obj->connect("Sensoriando", BROKER_USER, BROKER_PASSWD)) {
+        if ( obj->connect(namedevice, BROKER_USER, BROKER_PASSWD)) {
 #ifdef DEBUG_SENSORIANDO
             Serial.println("Broker Connected");
 #endif
-
         } else {
 #ifdef DEBUG_SENSORIANDO
             Serial.print("failed, rc=");
@@ -124,7 +132,7 @@ byte sensoriandoSendDatetime(SensoriandoObj *obj, SensoriandoParser *sensoring)
     }
 
     if ( ! sensoring->id ) {
-        sensoring-id = SYSTEM_RTC;
+        sensoring->id = SYSTEM_RTC;
     }
 
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
@@ -158,7 +166,7 @@ byte sensoriandoSendStorage(SensoriandoObj *obj, SensoriandoParser *sensoring)
     }
 
     if ( ! sensoring->id ) {
-        sensoring-id = SYSTEM_STORAGE;
+        sensoring->id = SYSTEM_STORAGE;
     }
 
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
@@ -190,7 +198,7 @@ byte sensoriandoSendMessage(SensoriandoObj *obj, SensoriandoParser *sensoring)
     }
 
     if ( ! sensoring->id ) {
-        sensoring-id = SYSTEM_MESSAGE;
+        sensoring->id = SYSTEM_MESSAGE;
     }
 
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);

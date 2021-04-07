@@ -27,7 +27,7 @@
 
 #define SYSTEM_RTC          1
 #define SYSTEM_STORAGE      2
-#define SSYTEM_MESSAGE      3
+#define SYSTEM_MESSAGE      3
 
 typedef PubSubClient SensoriandoObj;
 
@@ -36,7 +36,7 @@ typedef PubSubClient SensoriandoObj;
  * prototypes
  */
 byte sensoriandoInit(SensoriandoObj *, uint8_t *);
-byte sensoriandoReconnect(SensoriandoObj *);
+byte sensoriandoReconnect(SensoriandoObj *, uint8_t *);
  
 byte sensoriandoSendValue(SensoriandoObj *, SensoriandoParser *);
 byte sensoriandoSendDatetime(SensoriandoObj *, SensoriandoParser *);
