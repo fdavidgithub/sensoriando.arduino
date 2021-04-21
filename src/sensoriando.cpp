@@ -131,10 +131,7 @@ byte sensoriandoSendDatetime(SensoriandoObj *obj, SensoriandoParser *sensoring)
         sprintf(payload, "{\"value\":%ld}", sensoring->dt);       
     }
 
-    if ( ! sensoring->id ) {
-        sensoring->id = SYSTEM_RTC;
-    }
-
+    sensoring->id = SYSTEM_RTC;
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
     res = obj->publish(topic, payload);
@@ -165,10 +162,7 @@ byte sensoriandoSendStorage(SensoriandoObj *obj, SensoriandoParser *sensoring)
         sprintf(payload, "{\"value\":%s}", svalue);        
     }
 
-    if ( ! sensoring->id ) {
-        sensoring->id = SYSTEM_STORAGE;
-    }
-
+    sensoring->id = SYSTEM_STORAGE;
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
     res = obj->publish(topic, payload);
@@ -197,10 +191,7 @@ byte sensoriandoSendMessage(SensoriandoObj *obj, SensoriandoParser *sensoring)
         sprintf(payload, "{\"value\":\"%s\"}", sensoring->msg);         
     }
 
-    if ( ! sensoring->id ) {
-        sensoring->id = SYSTEM_MESSAGE;
-    }
-
+    sensoring->id = SYSTEM_MESSAGE;
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
     res =  obj->publish(topic, payload);
