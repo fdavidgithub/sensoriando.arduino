@@ -1,23 +1,28 @@
 /*
  * Description
  */
-#ifndef SENSORIANDO_H
-#define SENSORIANDO_H
+#ifndef SDK_H
+#define SDK_H
 
 #include <Arduino.h>
 #include <PubSubClient.h>
 #include <time.h>
+#include "log.h"
+#include "sensoriandoData.h"
 
-#ifndef SENSORIANDODATA_H
-    #include "sensoriandoData.h"
-#endif
 
 /*
  * MACROS
  */
-//#define DEBUG_SENSORIANDO
+//#define DEBUG_SDK
 
-#define ARRAY_LEN       256
+#ifdef DEBUG_SDK
+#define LOGGER_SDK(string, ...)       logargs(string, ##__VA_ARGS__)
+#else
+#define LOGGER_SDK(string, ...)       do {} while(0)
+#endif
+
+#define ARRAY_LEN           256
 
 #define BROKER              "broker.sensoriando.com.br"
 #define BROKER_PORT         1883

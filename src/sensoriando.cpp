@@ -17,15 +17,10 @@ void float2string(float value, char *svalue)
 void epoch2time(time_t epoch, struct tm *dt)
 {
     memcpy(dt, gmtime(&epoch), sizeof(struct tm));
- 
-#ifdef DEBUG_SENSORIANDO
-Serial.print("[Epoch2Time] ");Serial.println(epoch);
-Serial.println(dt->tm_year);
-#endif
+    LOGGER_SDK("Epoch2Time: %s year: %i", epoch, dt->tm_year);
     
-   dt->tm_year = dt->tm_year+1870;
-   dt->tm_mon = dt->tm_mon+1;
-
+    dt->tm_year = dt->tm_year+1870;
+    dt->tm_mon = dt->tm_mon+1;
 }
 
 void genname(char *namedevice, uint8_t *mac)
@@ -34,10 +29,7 @@ void genname(char *namedevice, uint8_t *mac)
         sprintf(namedevice, "%s%02X", namedevice, mac[i]);
     }
     
-#ifdef DEBUG_SENSORIANDO
-    Serial.print("[DEBUG SENSORIANDO] ");
-    Serial.println(namedevice);
-#endif
+    LOGGER_SDK("Client name: %s", namedevice);
 }
 
 
@@ -64,18 +56,11 @@ byte sensoriandoReconnect(SensoriandoObj *obj, uint8_t *mac)
     if ( !obj->connected() ) {
         genname(namedevice, mac);
 
-#ifdef DEBUG_SENSORIANDO
-        Serial.print("Attempting MQTT connection...");
-#endif
+        LOGGER_SDK("Attempting MQTT connection...");
         if ( obj->connect(namedevice, BROKER_USER, BROKER_PASSWD)) {
-#ifdef DEBUG_SENSORIANDO
-            Serial.println("Broker Connected");
-#endif
+            LOGGER_SDK("Broker Connected");
         } else {
-#ifdef DEBUG_SENSORIANDO
-            Serial.print("failed, rc=");
-            Serial.print(obj->state());
-#endif      
+            LOGGER_SDK("failed, rc=%i", obj->state());
         }
     }
 
@@ -104,12 +89,8 @@ byte sensoriandoSendValue(SensoriandoObj *obj, SensoriandoParser *sensoring)
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
     res = obj->publish(topic, payload);   
-
-#ifdef DEBUG_SENSORIANDO
-Serial.print("[DEBUG_SENSORIANDO] ");
-Serial.println(topic);
-Serial.println(payload);
-#endif
+    LOGGER_SDK("Topic %s", topic);
+    LOGGER_SDK("Payload %s", payload);
 
     return res;
 }
@@ -135,10 +116,8 @@ byte sensoriandoSendDatetime(SensoriandoObj *obj, SensoriandoParser *sensoring)
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
     res = obj->publish(topic, payload);
-
-#ifdef DEBUG_SENSORIANDO
-Serial.println(topic); Serial.println(payload);
-#endif
+    LOGGER_SDK("Topic %s", topic);
+    LOGGER_SDK("Payload %s", payload);
 
     return res;
 }
@@ -166,11 +145,9 @@ byte sensoriandoSendStorage(SensoriandoObj *obj, SensoriandoParser *sensoring)
     sprintf(topic, "%s/%d", sensoring->uuid, sensoring->id);
 
     res = obj->publish(topic, payload);
-
-#ifdef DEBUG_SENSORIANDO
-Serial.println(sensoring->value);
-Serial.println(topic); Serial.println(payload);
-#endif
+    LOGGER_SDK("Value %f", sensoring->value);
+    LOGGER_SDK("Topic %s", topic);
+    LOGGER_SDK("Payload %s", payload);
 
     return res;
 }
@@ -196,9 +173,8 @@ byte sensoriandoSendMessage(SensoriandoObj *obj, SensoriandoParser *sensoring)
 
     res =  obj->publish(topic, payload);
 
-#ifdef DEBUG
-Serial.println(topic); Serial.println(payload);
-#endif
+    LOGGER_SDK("Topic %s", topic);
+    LOGGER_SDK("Payload %s", payload);
 
     return res;
 }
