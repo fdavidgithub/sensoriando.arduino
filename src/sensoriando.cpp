@@ -1,6 +1,12 @@
 #include "sensoriando.h"
 
 /*
+ * Global variables
+ */
+struct _brokerCredentials brokerCredentials;
+
+
+/*
  * If you have ever tried to use sprintf() on an Arduino (on ESP it work) 
  * to convert from a float to a string, the function will most likely return a ?.
  *
@@ -36,15 +42,21 @@ void genname(char *namedevice, uint8_t *mac)
 /* 
  * Public functions
  */
-byte sensoriandoInit(SensoriandoObj *obj, uint8_t *mac)
+byte sensoriandoInit(SensoriandoObj *obj, uint8_t *mac, char* brokerUser, char* brokerPass)
 {
     byte res;
     char namedevice[30] = BROKER_CLIENTNAME;
+    brokerCredentials.username = brokerUser;
+    brokerCredentials.password = brokerPass;
 
     genname(namedevice, mac);
 
     obj->setServer(BROKER, BROKER_PORT);  
-    res = obj->connect(namedevice, BROKER_USER, BROKER_PASSWD);
+    res = obj->connect(namedevice, brokerCredentials.username, brokerCredentials.password);
+
+    if ( !res ) {
+        LOGGER_SDK("Broker not found or no authentication: %s", BROKER);
+    }
 
     return res;
 }
@@ -57,7 +69,7 @@ byte sensoriandoReconnect(SensoriandoObj *obj, uint8_t *mac)
         genname(namedevice, mac);
 
         LOGGER_SDK("Attempting MQTT connection...");
-        if ( obj->connect(namedevice, BROKER_USER, BROKER_PASSWD)) {
+        if ( obj->connect(namedevice, brokerCredentials.username, brokerCredentials.password)) {
             LOGGER_SDK("Broker Connected");
         } else {
             LOGGER_SDK("failed, rc=%i", obj->state());

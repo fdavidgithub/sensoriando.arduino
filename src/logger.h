@@ -1,5 +1,5 @@
-#ifndef LOG_H
-#define LOG_H
+#ifndef LOGGER_H
+#define LOGGER_H
 
 #include <Arduino.h>
 #include <stdarg.h>
@@ -13,6 +13,6 @@
 /*
  * Prototypes
  */
-void logargs(char*, ...);
+void logger(char*, ...);
 #endif
 

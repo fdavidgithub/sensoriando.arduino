@@ -1,6 +1,6 @@
-#include "log.h"
+#include "logger.h"
 
-void logargs(char *string, ...)
+void logger(char *string, ...)
 {
     char buffer[256];
     va_list args;
